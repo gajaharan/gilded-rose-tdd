@@ -35,14 +35,26 @@ class Tests {
        )
 
         val expected = listOf(
-            "10 August 2025"
+            "10 August 2025",
+            "banana, 0, 42",
+            "kumquat, 0, 101"
         )
 
         assertEquals(expected, stock.printout())
     }
 }
  private fun List<Item>.printout(): List<String> {
-     return listOf("10 August 2025")
+     return listOf("10 August 2025") + this.map {
+         it.toPrintout()
+     }
  }
+
+private fun Item.toPrintout(): String {
+    return "$name, $daysUntilSellBy, $quantity"
+}
+
+private val Item.daysUntilSellBy: String
+    get() { return "0" }
+
 
 
