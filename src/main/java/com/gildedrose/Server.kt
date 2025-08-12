@@ -65,12 +65,12 @@ private val templateSource = """
     <body>
     <h1>{{this.now}}</h1>
     <table>
-   <th>
-        <td>Name</td>
-        <td>Sell by date</td>
-        <td>Sell by days</td>
-        <td>Quantity</td>
-    </th>
+   <tr>
+        <th>Name</th>
+        <th>Sell by date</th>
+        <th>Sell by days</th>
+        <th>Quantity</th>
+    </tr>
     {{#each this.items}}<tr>
         <td>{{this.name}}</td>
         <td>{{this.sellByDate}}</td>

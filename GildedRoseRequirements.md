@@ -15,7 +15,12 @@ The print should show today's date, and a list of all items with their name, num
 
 I want to load the stock list from disk and print it to the screen in the format that we agreed.
 
-## View Stock List In Browser
+## ✓ View Stock List In Browser
 
 I'm sick of the command line. I want to view the stock list in my browser.
 The format should be the same as previous.
+
+## When I View the Stock in a Browser It Should Update Qualities
+
+Quality update is going to be complicated, but for now just reduce the quality of each item by one every day.
+
