@@ -12,6 +12,11 @@ import org.http4k.server.Undertow
 import org.http4k.server.asServer
 import org.intellij.lang.annotations.Language
 import java.time.LocalDate
+import java.time.format.DateTimeFormatter
+import java.time.format.FormatStyle
+import java.time.temporal.ChronoUnit.DAYS
+
+val dateFormat: DateTimeFormatter = DateTimeFormatter.ofLocalizedDate(FormatStyle.LONG)
 
 class Server(
     stock: List<Item>,
@@ -21,9 +26,12 @@ class Server(
         "/" bind Method.GET to { request ->
             val now = clock()
             Response(Status.OK).body(
-                rootTemplate.apply(stock.map {
-                    it.toMap(now)
-                })
+                rootTemplate.apply(
+                    mapOf(
+                        "now" to dateFormat.format(now),
+                        "items" to stock.map { it.toMap(now) }
+                    )
+                )
             )
         }
     )
@@ -43,22 +51,34 @@ class Server(
 
 private fun Item.toMap(now: LocalDate): Map<String,String> = mapOf(
     "name" to name,
-    "sellByDate" to format.format(sellByDate),
+    "sellByDate" to dateFormat.format(sellByDate),
     "sellByDays" to this.daysUntilSellBy(now).toString(),
     "quantity" to quantity.toString()
 )
 
+private fun Item.daysUntilSellBy(now: LocalDate): Long = DAYS.between(now, this.sellByDate)
+
+
 @Language("HTML")
 private val templateSource = """
-    <html>
+    <html lang="en">
     <body>
-    {{#each}}<tr>
+    <h1>{{this.now}}</h1>
+    <table>
+   <th>
+        <td>Name</td>
+        <td>Sell by date</td>
+        <td>Sell by days</td>
+        <td>Quantity</td>
+    </th>
+    {{#each this.items}}<tr>
         <td>{{this.name}}</td>
         <td>{{this.sellByDate}}</td>
         <td>{{this.sellByDays}}</td>
         <td>{{this.quantity}}</td>
     </tr>
     {{/each}}
+    </table>
     </body>
     </html>
     """.trimIndent()
