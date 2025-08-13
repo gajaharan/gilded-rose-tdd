@@ -4,7 +4,6 @@ import org.http4k.core.Method
 import org.http4k.core.Request
 import org.http4k.core.Response
 import org.http4k.core.Status
-import org.http4k.routing.RoutingHttpHandler
 import org.http4k.testing.ApprovalTest
 import org.http4k.testing.Approver
 import org.http4k.testing.assertApproved
@@ -23,9 +22,8 @@ class ListStockTests {
             Item("kumquat", now.plusDays(1), 101)
         )
 
-        val server = Server(stock) { now }
-        val client: RoutingHttpHandler = server.routes
-        val response: Response = client(Request(Method.GET, "/"))
+        val routes = routes(stock) { now }
+        val response: Response = routes(Request(Method.GET, "/"))
 
         approver.assertApproved(response, Status.OK)
     }
