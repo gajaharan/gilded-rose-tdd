@@ -3,30 +3,54 @@ package com.gildedrose
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.io.TempDir
 import java.io.File
-import java.time.LocalDate
 import kotlin.test.assertEquals
+import java.time.Instant
 
 class PersistenceTests {
+    private val now = Instant.now()
+    private val items = listOf<Item>(
+        Item("banana", aug10, 42),
+        Item("kumquat", aug10.plusDays(1), 101)
+    )
 
     @Test
-    fun `load and save`(@TempDir dir: File) {
+    fun `save and load file`(@TempDir dir: File) {
+
         println(dir)
         val file = File(dir, "stock.tsv")
-        val stock = listOf<Item>(
-            Item("banana", aug10, 42),
-            Item("kumquat", aug10.plusDays(1), 101)
-        )
-        stock.saveTo(file)
-        assertEquals(stock, file.loadItems())
+        val stockList = StockList(now, items)
+            stockList.saveTo(file)
+        assertEquals(stockList, file.loadItems(defaultLastModified = now.plusSeconds(3600)))
     }
+
 
     @Test
     fun `load and save empty`(@TempDir dir: File) {
         val file = File(dir, "stock.tsv")
-        val stock = emptyList<Item>()
+        val stockList = StockList(now, emptyList())
 
-        stock.saveTo(file)
-        assertEquals(stock, file.loadItems())
+        stockList.saveTo(file)
+        assertEquals(stockList, file.loadItems(defaultLastModified = now.plusSeconds(3600)))
     }
 
+    @Test
+    fun `load legacy file`(@TempDir dir: File) {
+
+        println(dir)
+        val file = File(dir, "stock.tsv")
+        items.legacySaveTo(file)
+        assertEquals(StockList(
+            lastModified = now,
+            items = items
+        ), file.loadItems(defaultLastModified = now))
+    }
+
+    private fun List<Item>.legacySaveTo(file: File) {
+        fun Item.toLine() = "$name\t$sellByDate\t$quantity"
+        file.writer().buffered().use { writer ->
+            this.forEach { item ->
+                writer.appendLine(item.toLine())
+            }
+        }
+    }
 }
