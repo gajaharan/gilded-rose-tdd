@@ -3,6 +3,7 @@ package com.gildedrose
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.io.TempDir
 import java.io.File
+import java.io.IOException
 import kotlin.test.assertEquals
 import java.time.Instant
 
@@ -25,12 +26,34 @@ class PersistenceTests {
 
 
     @Test
-    fun `load and save empty`(@TempDir dir: File) {
-        val file = File(dir, "stock.tsv")
+    fun `load and save empty`() {
         val stockList = StockList(now, emptyList())
+        assertEquals(
+            stockList,
+            stockList.toLines().toStockList(defaultLastModified = now.plusSeconds(3600))
+        )
+    }
 
-        stockList.saveTo(file)
-        assertEquals(stockList, file.loadItems(defaultLastModified = now.plusSeconds(3600)))
+    @Test
+    fun `load with no lastModified header`() {
+        val lines = sequenceOf("# not modified")
+        assertEquals(
+            StockList(now, emptyList()),
+            lines.toStockList(defaultLastModified = now)
+        )
+    }
+
+    @Test
+    fun `load with blank lastModified header`() {
+        val lines = sequenceOf("# LastModified: ")
+        try {
+            lines.toStockList(defaultLastModified = now)
+        } catch (x: IOException) {
+            assertEquals(
+                "Cound not parse LastModified header: Text '' could not be parsed at index 0",
+                x.message
+                )
+        }
     }
 
     @Test
