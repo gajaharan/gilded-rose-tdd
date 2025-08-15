@@ -7,18 +7,15 @@ import java.time.LocalDate
 import java.time.format.DateTimeParseException
 
 
-fun File.loadItems(
-    defaultLastModified: Instant = Instant.now()
-): StockList =
-    useLines { lines -> lines.toStockList(defaultLastModified) }
+fun File.loadItems(): StockList =
+    useLines { lines -> lines.toStockList() }
 
 
 fun Sequence<String>.toStockList(
-    defaultLastModified: Instant
 ): StockList {
     val (header, body) = partition { it.startsWith("#") }
     return StockList(
-        lastModified = lastModifiedFrom(header) ?: defaultLastModified,
+        lastModified = lastModifiedFrom(header) ?: Instant.EPOCH,
         items = body.map { line -> line.toItem() }.toList()
     )
 }

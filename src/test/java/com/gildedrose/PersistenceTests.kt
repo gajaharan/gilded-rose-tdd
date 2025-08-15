@@ -21,7 +21,7 @@ class PersistenceTests {
         val file = File(dir, "stock.tsv")
         val stockList = StockList(now, items)
             stockList.saveTo(file)
-        assertEquals(stockList, file.loadItems(defaultLastModified = now.plusSeconds(3600)))
+        assertEquals(stockList, file.loadItems())
     }
 
 
@@ -30,16 +30,25 @@ class PersistenceTests {
         val stockList = StockList(now, emptyList())
         assertEquals(
             stockList,
-            stockList.toLines().toStockList(defaultLastModified = now.plusSeconds(3600))
+            stockList.toLines().toStockList()
         )
     }
+
+    @Test
+    fun `load from empty file`() {
+        assertEquals(
+            StockList(Instant.EPOCH, emptyList()),
+            emptySequence<String>().toStockList()
+        )
+    }
+
 
     @Test
     fun `load with no lastModified header`() {
         val lines = sequenceOf("# not modified")
         assertEquals(
-            StockList(now, emptyList()),
-            lines.toStockList(defaultLastModified = now)
+            StockList(Instant.EPOCH, emptyList()),
+            lines.toStockList()
         )
     }
 
@@ -47,7 +56,7 @@ class PersistenceTests {
     fun `load with blank lastModified header`() {
         val lines = sequenceOf("# LastModified: ")
         try {
-            lines.toStockList(defaultLastModified = now)
+            lines.toStockList()
         } catch (x: IOException) {
             assertEquals(
                 "Cound not parse LastModified header: Text '' could not be parsed at index 0",
@@ -63,9 +72,9 @@ class PersistenceTests {
         val file = File(dir, "stock.tsv")
         items.legacySaveTo(file)
         assertEquals(StockList(
-            lastModified = now,
+            lastModified = Instant.EPOCH,
             items = items
-        ), file.loadItems(defaultLastModified = now))
+        ), file.loadItems())
     }
 
     private fun List<Item>.legacySaveTo(file: File) {
