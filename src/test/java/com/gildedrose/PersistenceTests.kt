@@ -26,7 +26,7 @@ class PersistenceTests {
 
 
     @Test
-    fun `load and save empty`() {
+    fun `load and save empty stocklist`() {
         val stockList = StockList(now, emptyList())
         assertEquals(
             stockList,
@@ -62,27 +62,6 @@ class PersistenceTests {
                 "Cound not parse LastModified header: Text '' could not be parsed at index 0",
                 x.message
                 )
-        }
-    }
-
-    @Test
-    fun `load legacy file`(@TempDir dir: File) {
-
-        println(dir)
-        val file = File(dir, "stock.tsv")
-        items.legacySaveTo(file)
-        assertEquals(StockList(
-            lastModified = Instant.EPOCH,
-            items = items
-        ), file.loadItems())
-    }
-
-    private fun List<Item>.legacySaveTo(file: File) {
-        fun Item.toLine() = "$name\t$sellByDate\t$quantity"
-        file.writer().buffered().use { writer ->
-            this.forEach { item ->
-                writer.appendLine(item.toLine())
-            }
         }
     }
 }

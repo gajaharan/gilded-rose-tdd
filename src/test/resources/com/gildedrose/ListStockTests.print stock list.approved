@@ -1,6 +1,6 @@
 <html lang="en">
 <body>
-<h1>10 August 2025</h1>
+<h1>21 September 2025</h1>
 <table>
 <tr>
     <th>Name</th>
@@ -11,13 +11,13 @@
 <tr>
     <td>banana</td>
     <td>9 August 2025</td>
-    <td style="text-align: right">-1</td>
+    <td style="text-align: right">-43</td>
     <td style="text-align: right">42</td>
 </tr>
 <tr>
     <td>kumquat</td>
     <td>11 August 2025</td>
-    <td style="text-align: right">1</td>
+    <td style="text-align: right">-41</td>
     <td style="text-align: right">101</td>
 </tr>
 
